@@ -37,6 +37,18 @@ router.post('/cria_opcao_resposta', (req, res, next) => {
     const descricao_opcao = req.body.descricao_opcao;
     const peso = req.body.peso;
 
+    if (peso < 0) {
+      return res.status(500).send({
+        error: 'Não é possível cadastrar uma questão com peso negativo'
+      });
+    }
+
+    if (resposta_certa === 1 && peso === 0) {
+      return res.status(500).send({
+        error: 'Resposta certa deve ter um peso maior que zero'
+      });
+    }
+
     conn.query(
       `insert into multiplas_escolhas (pergunta_id, resposta, correta, descricao, peso)
          values ((select id from pergunta where descricao = "${pergunta}"), "${opcao_letra}", ${resposta_certa}, "${descricao_opcao}", ${peso});`,
